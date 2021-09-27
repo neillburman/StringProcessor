@@ -1,0 +1,155 @@
+﻿ /*------------------SQL Exercise -------------------------*/
+--1. Drop Tables
+--2. Create Tables
+--3. Populate Tables
+--4. Run Query
+
+IF NOT EXISTS(SELECT * FROM sys.databases WHERE name = 'LocalDataCo')
+BEGIN
+	CREATE DATABASE [LocalDataCo]
+ 
+END
+GO
+USE [LocalDataCo]   
+
+ 
+/*--------------Drop Tables if present  -----*/
+
+IF OBJECT_ID('dbo.Footfall') IS NOT NULL drop table dbo.Footfall
+IF OBJECT_ID('dbo.Premises') IS NOT NULL drop table dbo.Premises
+IF OBJECT_ID('dbo.Businesses') IS NOT NULL drop table dbo.Businesses
+/*---------------Create [Businesses] table -----*/
+
+CREATE TABLE [dbo].[Businesses](
+	[Id] [int]  NOT NULL,
+	[Business] [nvarchar](500) NULL,
+ CONSTRAINT [PK_Businesses] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+/*---------------Create [Premises] table -----*/
+CREATE TABLE [dbo].[Premises](
+	[Id] [int] NOT NULL,
+	[Street] [nvarchar](100) NOT NULL,
+	[PostCode] [nchar](10) NOT NULL,
+	[StreetNo] [nchar](10) NULL,
+	[BusinessId] [int] NOT NULL,
+ CONSTRAINT [PK_Premises] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+ALTER TABLE [dbo].[Premises]  WITH CHECK ADD  CONSTRAINT [FK_Premises_Businesses] FOREIGN KEY([BusinessId])
+REFERENCES [dbo].[Businesses] ([Id])
+GO
+
+ALTER TABLE [dbo].[Premises] CHECK CONSTRAINT [FK_Premises_Businesses]
+GO
+
+/*---------------Create Footfall table -----*/
+CREATE TABLE [dbo].[Footfall](
+	[WeekNo] [int] NOT NULL,
+	[PremisesId] [int] NOT NULL,
+	[Count] [int] NULL,
+ CONSTRAINT [UQ_UserId_ContactID] UNIQUE NONCLUSTERED 
+(
+	[WeekNo] ASC,
+	[PremisesId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+ALTER TABLE [dbo].[Footfall]  WITH CHECK ADD  CONSTRAINT [FK_Footfall_Premises] FOREIGN KEY([PremisesId])
+REFERENCES [dbo].[Premises] ([Id])
+GO
+
+ALTER TABLE [dbo].[Footfall] CHECK CONSTRAINT [FK_Footfall_Premises]
+GO
+
+ 
+/*-------------------------------------------------------------------------------------------*/
+/*-----------------------------------Populate Tables ----------------------------------------*/
+/*-------------------------------------------------------------------------------------------*/
+--USE [LocalDataCo]
+--GO
+
+INSERT INTO [dbo].[Businesses] ([Id],[Business]) VALUES(10000022, 'PizzaExpress')
+INSERT INTO [dbo].[Businesses] ([Id],[Business]) VALUES(10000024, 'Holland & Barrett')
+INSERT INTO [dbo].[Businesses] ([Id],[Business]) VALUES(10000025, 'Cafe Rouge') 
+INSERT INTO [dbo].[Businesses] ([Id],[Business]) VALUES(10000026, 'Lloyds TSB') 
+INSERT INTO [dbo].[Businesses] ([Id],[Business]) VALUES(10000028, 'Ernet Jones') 
+INSERT INTO [dbo].[Businesses] ([Id],[Business]) VALUES(10000029, 'Boots The Chemist') 
+INSERT INTO [dbo].[Businesses] ([Id],[Business]) VALUES(10000031, 'HSBC') 
+INSERT INTO [dbo].[Businesses] ([Id],[Business]) VALUES(10000032, 'The Body Shop') 
+INSERT INTO [dbo].[Businesses] ([Id],[Business]) VALUES(10000033, 'ABC Pharmacy') 
+INSERT INTO [dbo].[Businesses] ([Id],[Business]) VALUES(10000034, 'Oxfam') 
+ 
+ INSERT INTO [dbo].[Premises] ([Id], [Street], [PostCode], [StreetNo] , [BusinessId]) VALUES(8016,'Portobello Road', 'W11 2DY', '79', 10000025)
+ INSERT INTO [dbo].[Premises] ([Id], [Street], [PostCode], [StreetNo] , [BusinessId]) VALUES(4920,'Kenal Street', 'W2 2AW', Null, 10000034)
+ INSERT INTO [dbo].[Premises] ([Id], [Street], [PostCode], [StreetNo] , [BusinessId]) VALUES(2285,'Earls Court Road', 'W8 6EA', '10', 10000029)
+ INSERT INTO [dbo].[Premises] ([Id], [Street], [PostCode], [StreetNo] , [BusinessId]) VALUES(3859,'Glenburnie Road', 'SW17 7PJ', '15a', 10000024)
+ INSERT INTO [dbo].[Premises] ([Id], [Street], [PostCode], [StreetNo] , [BusinessId]) VALUES(9484,'Mere Street', 'IP22 4AD', '6', 10000026)
+ INSERT INTO [dbo].[Premises] ([Id], [Street], [PostCode], [StreetNo] , [BusinessId]) VALUES(1839,'Commercial Road', 'NG6 8HA', '16', 10000032)
+ INSERT INTO [dbo].[Premises] ([Id], [Street], [PostCode], [StreetNo] , [BusinessId]) VALUES(4837,'Wilmslow Road', 'M20 3BW', '432-434', 10000031)
+ INSERT INTO [dbo].[Premises] ([Id], [Street], [PostCode], [StreetNo] , [BusinessId]) VALUES(2958,'Edgeware Road', 'W2 1ET', '62-64', 10000028)
+ INSERT INTO [dbo].[Premises] ([Id], [Street], [PostCode], [StreetNo] , [BusinessId]) VALUES(2020,'York Road', 'TS26 9EN', Null, 10000022)
+ INSERT INTO [dbo].[Premises] ([Id], [Street], [PostCode], [StreetNo] , [BusinessId]) VALUES(5472,'Preston Road', 'BN1 4QF', Null, 10000033)
+
+ 
+
+INSERT INTO [dbo].[Footfall] ([WeekNo],[PremisesId],[Count])   VALUES (32, 8016, 382)
+INSERT INTO [dbo].[Footfall] ([WeekNo],[PremisesId],[Count])   VALUES (32, 4920, 182)
+INSERT INTO [dbo].[Footfall] ([WeekNo],[PremisesId],[Count])   VALUES (32, 2285, 948)
+INSERT INTO [dbo].[Footfall] ([WeekNo],[PremisesId],[Count])   VALUES (32, 3859, 272)
+INSERT INTO [dbo].[Footfall] ([WeekNo],[PremisesId],[Count])   VALUES (32, 1839, 272)
+INSERT INTO [dbo].[Footfall] ([WeekNo],[PremisesId],[Count])   VALUES (32, 4837, 494)
+INSERT INTO [dbo].[Footfall] ([WeekNo],[PremisesId],[Count])   VALUES (32, 2958, 220)
+INSERT INTO [dbo].[Footfall] ([WeekNo],[PremisesId],[Count])   VALUES (32, 2020, 181)
+INSERT INTO [dbo].[Footfall] ([WeekNo],[PremisesId],[Count])   VALUES (32, 5472, 282)
+ 
+ 
+
+INSERT INTO [dbo].[Footfall] ([WeekNo],[PremisesId],[Count])   VALUES (33, 8016, 494)
+INSERT INTO [dbo].[Footfall] ([WeekNo],[PremisesId],[Count])   VALUES (33, 4920, 282)
+INSERT INTO [dbo].[Footfall] ([WeekNo],[PremisesId],[Count])   VALUES (33, 2285, 952)
+INSERT INTO [dbo].[Footfall] ([WeekNo],[PremisesId],[Count])   VALUES (33, 3859, 282)
+INSERT INTO [dbo].[Footfall] ([WeekNo],[PremisesId],[Count])   VALUES (33, 9484, 383)
+INSERT INTO [dbo].[Footfall] ([WeekNo],[PremisesId],[Count])   VALUES (33, 1839, 181)
+INSERT INTO [dbo].[Footfall] ([WeekNo],[PremisesId],[Count])   VALUES (33, 4837, 285)
+INSERT INTO [dbo].[Footfall] ([WeekNo],[PremisesId],[Count])   VALUES (33, 2958, 494)
+INSERT INTO [dbo].[Footfall] ([WeekNo],[PremisesId],[Count])   VALUES (33, 2020, 289)
+INSERT INTO [dbo].[Footfall] ([WeekNo],[PremisesId],[Count])   VALUES (33, 5472, 939)
+
+
+INSERT INTO [dbo].[Footfall] ([WeekNo],[PremisesId],[Count])   VALUES (34, 8016, null)
+INSERT INTO [dbo].[Footfall] ([WeekNo],[PremisesId],[Count])   VALUES (34, 4920, 712)
+INSERT INTO [dbo].[Footfall] ([WeekNo],[PremisesId],[Count])   VALUES (34, 2285, 284)
+INSERT INTO [dbo].[Footfall] ([WeekNo],[PremisesId],[Count])   VALUES (34, 3859, 595)
+INSERT INTO [dbo].[Footfall] ([WeekNo],[PremisesId],[Count])   VALUES (34, 1839, 595)
+INSERT INTO [dbo].[Footfall] ([WeekNo],[PremisesId],[Count])   VALUES (34, 4837, 181)
+INSERT INTO [dbo].[Footfall] ([WeekNo],[PremisesId],[Count])   VALUES (34, 2958, 959)
+INSERT INTO [dbo].[Footfall] ([WeekNo],[PremisesId],[Count])   VALUES (34, 2020, 484)
+INSERT INTO [dbo].[Footfall] ([WeekNo],[PremisesId],[Count])   VALUES (34, 5472, 817)
+
+--truncate table  dbo.footfall
+
+-- Select * from [dbo].[Businesses]
+-- Select * from [dbo].[Premises]
+--  Select * from [dbo].[Footfall]
+
+/*-------------------------------------------------------------------------------------------*/
+/*-----------------------------------Query Required for the Exercise ------------------------*/
+/*-------------------------------------------------------------------------------------------*/
+  select b.Business,  Coalesce(p.StreetNo,'') as StreetNi, p.Street, p.PostCode, Coalesce(f.Count,0) as Count
+  from [dbo].[Businesses] b with (NoLock)
+  inner join [dbo].[Premises] p
+  on b.Id = p.BusinessId
+  inner join [dbo].[Footfall] f
+  on p.Id = f.PremisesId 
+ 
+  
